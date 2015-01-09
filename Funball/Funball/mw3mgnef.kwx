@@ -1,0 +1,104 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+
+
+namespace Funball
+{
+    
+    class RacquetModel : BasicModel
+    {
+        
+        Vector3 cameraPosition;
+
+        Vector3 preCameraPosition;
+
+        Vector3 racquetPosition;
+
+        float speed = 6;
+        Vector3 moveSideToSide = new Vector3(0, 0, 1);
+        Vector3 moveForwardAndBackward = new Vector3(1,0,0);
+        float yaw;
+
+        public RacquetModel(Model m, Vector3 racquetPosition,float yaw, float pitch, float roll, Vector3 cameraPosition,float scale)
+            : base(m, racquetPosition, yaw, pitch, roll,scale)
+        {
+            this.racquetPosition = racquetPosition;
+            this.cameraPosition = cameraPosition;
+            this.yaw = yaw;
+            
+        }
+
+        public override void Update()
+        {
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Up))
+            {
+
+                racquetPosition = -(moveForwardAndBackward * speed);
+                world = GetWorld() * Matrix.CreateTranslation(racquetPosition);
+
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Down))
+            {
+                // racquetPosition -= cameraPosition;
+                racquetPosition = moveForwardAndBackward * speed;
+                world = GetWorld() * Matrix.CreateTranslation(racquetPosition);
+            }
+
+             if (Keyboard.GetState().IsKeyDown(Keys.Left))
+            {
+                //if (world.Translation.Z > 155)
+                //    racquetPosition.Y = 155;
+                //else
+               racquetPosition = moveSideToSide * speed;
+
+               world = world * Matrix.CreateTranslation(racquetPosition);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Right))
+            {
+                //if (world.Translation.Z < -350)
+                //    racquetPosition.Y = -350;
+                //else
+                   racquetPosition = -(moveSideToSide * speed);
+ 
+                 world = world * Matrix.CreateTranslation(racquetPosition);
+             }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Z))
+            {
+                float yawAngle = MathHelper.ToRadians(-1);
+                if (Math.Abs(MathHelper.ToRadians(-60) + yaw) > MathHelper.Pi)
+                {
+                    yaw += yawAngle;
+ 
+                }
+                //yaw += yawAngle;
+                world = world * Matrix.CreateRotationZ(yaw);
+            }
+
+            if (Keyboard.GetState().IsKeyDown(Keys.D))
+            {
+                //if (world.Translation.Z < -350)
+                //    racquetPosition.Y = -350;
+                //else
+                racquetPosition = -(moveSideToSide * speed);
+
+                world = world * Matrix.CreateTranslation(racquetPosition);
+            }
+
+  
+
+            base.Update();
+        }
+    }
+}

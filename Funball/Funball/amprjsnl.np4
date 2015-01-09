@@ -1,0 +1,148 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+
+
+namespace Funball
+{
+    /// <summary>
+    /// This is a game component that implements IUpdateable.
+    /// </summary>
+    public class ModelManager : DrawableGameComponent
+    {
+        SpinningBall ball;
+        RacquetModel racquet;
+        BasicModel room;
+
+        //BasicModel testBall;
+        List<BasicModel> models = new List<BasicModel>();
+
+        MouseState preMouseState;
+
+        // Misses variables
+        int missedThisLevel = 0;
+
+        // Current level
+        int currentLevel = 0;
+
+        // List of LevelInfo objects
+        List<LevelInfo> levelInfoList = new List<LevelInfo>();
+
+        // Scoring
+        const int pointsPerKill = 20;
+
+        /* Powerup stuff
+        public int consecutiveKills = 0;
+        int rapidFireKillRequirement = 3;*/
+
+        public int missesLeft
+        {
+            get
+            {
+                return
+                    levelInfoList[currentLevel].missesAllowed
+                    - missedThisLevel;
+            }
+        }
+
+        public ModelManager(Game game)
+            : base(game)
+        {
+            // Initialize game levels
+            levelInfoList.Add(new LevelInfo(1000, 3000, 20, 2, 6, 10));
+            levelInfoList.Add(new LevelInfo(900, 2800, 22, 2, 6, 9));
+            levelInfoList.Add(new LevelInfo(800, 2600, 24, 2, 6, 8));
+            levelInfoList.Add(new LevelInfo(700, 2400, 26, 3, 7, 7));
+            levelInfoList.Add(new LevelInfo(600, 2200, 28, 3, 7, 6));
+            levelInfoList.Add(new LevelInfo(500, 2000, 30, 3, 7, 5));
+            levelInfoList.Add(new LevelInfo(400, 1800, 32, 4, 7, 4));
+            levelInfoList.Add(new LevelInfo(300, 1600, 34, 4, 8, 3));
+            levelInfoList.Add(new LevelInfo(200, 1400, 36, 5, 8, 2));
+            levelInfoList.Add(new LevelInfo(100, 1200, 38, 5, 9, 1));
+            levelInfoList.Add(new LevelInfo(50, 1000, 40, 6, 9, 0));
+            levelInfoList.Add(new LevelInfo(50, 800, 42, 6, 9, 0));
+            levelInfoList.Add(new LevelInfo(50, 600, 44, 8, 10, 0));
+            levelInfoList.Add(new LevelInfo(25, 400, 46, 8, 10, 0));
+            levelInfoList.Add(new LevelInfo(0, 200, 48, 18, 20, 0));
+        }
+
+        /// <summary>
+        /// Allows the game component to perform any initialization it needs to before starting
+        /// to run.  This is where it can query for any required services and load content.
+        /// </summary>
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            ball = new SpinningBall(
+                Game.Content.Load<Model>(@"Models/ball_textured"),
+                new Vector3(0, 0, 0),
+                new Vector3(110, 110, 0),
+                0.4f);
+
+            racquet = new RacquetModel(
+                Game.Content.Load<Model>(@"Models/racquet_textured"),
+                new Vector3(-100,-150,-100),
+                MathHelper.ToRadians(-60),
+                MathHelper.PiOver4,
+                0,
+                ((Game1)Game).camera.cameraPosition,
+                0.4f);
+
+            room = new BasicModel(
+                Game.Content.Load<Model>(@"Models/room_fix"),
+                new Vector3(30, -100, -100),
+                0,
+                0,
+                0,
+                1.0f);
+            base.LoadContent();
+        }
+
+        /// <summary>
+        /// Allows the game component to update itself.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        public override void Update(GameTime gameTime)
+        {
+            if(ball.holdBall &&
+                Keyboard.GetState().IsKeyDown(Keys.Space))
+                ball.holdBall = false;
+
+            // Update ball
+            ball.Update();
+            racquet.Update();
+
+
+          //  racket.Update();
+          //  Matrix n = racket.GetWorld();
+
+            //n = Matrix.Transform(n,);
+            //n = Matrix( ((Game1)Game).camera.cameraPosition );
+
+           // n = Matrix.CreateLookAt();
+
+            base.Update(gameTime);
+        }
+
+        public override void Draw(GameTime gameTime)
+        {
+            room.Draw(((Game1)Game).camera);
+            ball.Draw(((Game1)Game).camera);
+            racquet.Draw(((Game1)Game).camera);
+
+            base.Draw(gameTime);
+        }
+
+    }
+}
